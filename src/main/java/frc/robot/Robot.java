@@ -4,12 +4,14 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -39,8 +41,11 @@ public class Robot extends TimedRobot {
 
    //shoot motors
    TalonSRX m_indexer = new TalonSRX(RobotMap.INDEXID);
-   CANSparkMax m_shootIntake = new CANSparkMax(RobotMap.SHOOTINTAKEID, MotorType.kBrushless);
-   CANSparkMax m_shoot = new CANSparkMax(RobotMap.SHOOTID, MotorType.kBrushless);
+   TalonFX m_shootIntake = new TalonFX(RobotMap.SHOOTINTAKEID);  
+   TalonFX m_shoot = new TalonFX(RobotMap.SHOOTID);
+
+   //auto/timer stuffs
+   Timer timer = new Timer();
 
 
   /**
@@ -51,7 +56,36 @@ public class Robot extends TimedRobot {
   public void robotInit() {}
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    
+    if(timer.get()<RobotMap.AUTOSPINUPSHOOTINIT){
+      m_shoot.set(ControlMode.PercentOutput, RobotMap.AUTOSHOOTSPEED);
+
+      //deployRetract.set(0.2);
+    }
+    if(timer.get()<RobotMap.AUTOSHOOTFIRST&& timer.get()> RobotMap.AUTOSPINUPSHOOTINIT){
+      //shooter.set(RobotMap.AUTOSHOOTSPEED);
+      m_shootIntake.set(ControlMode.PercentOutput, RobotMap.AUTOSHOOTINTAKESPEED);
+      m_indexer.set(ControlMode.PercentOutput, RobotMap.AUTOINDEXERSPEED);
+
+
+      //deployRetract.set(0.0);
+    }
+    if(timer.get()>RobotMap.AUTOSHOOTFIRST &&timer.get()<RobotMap.AUTODRIVEBACK){
+      m_shoot.set(ControlMode.PercentOutput, 0);
+      m_shootIntake.set(ControlMode.PercentOutput, 0);
+      m_indexer.set(ControlMode.PercentOutput, 0);
+
+
+      
+      drive.arcadeDrive(0, .36);
+      //intake.set(-0.7);
+    }
+    
+    if(timer.get()>RobotMap.AUTODRIVEBACK && timer.get()<RobotMap.AUTOSTOPDRIVE){
+      drive.arcadeDrive(0,0);
+    }
+  }
 
   @Override
   public void autonomousInit() {}
@@ -129,26 +163,32 @@ public void arcadeDrive(){
 
   public void allShoot(){
     //shootIntake
+    //if shootintake in, indexer spins opposite direction
     if(operator.getRawButton(RobotMap.shootIntakeButtonIn)){
-      m_shootIntake.set(-.4);
-      m_indexer.set(ControlMode.PercentOutput, -0.2);
+      m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDIN);
+      if(!operator.getRawButton(RobotMap.indexButton))
+      m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDBAC);
+      if(operator.getRawButton(RobotMap.indexButton)){
+        m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDFOR);
+      }
     }
+    //shoot intake out
     if(operator.getRawButton(RobotMap.shootIntakeButtonOut)){
-      m_shootIntake.set(.4);
+      m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDOUT);
      m_indexer.set(ControlMode.PercentOutput, 0);
     }
     //index
     if(operator.getRawButton(RobotMap.indexButton)){
-     m_indexer.set(ControlMode.PercentOutput, .6);
+     m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDFOR);
     }
     //shoot
     if(operator.getRawButton(RobotMap.shootButton)){
-      m_shoot.set(.65);
+      m_shoot.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTSPEED);
     }
     else{
       m_indexer.set(ControlMode.PercentOutput, 0);
-      m_shootIntake.set(0.0);
-      m_shoot.set(0);
+      m_shootIntake.set(ControlMode.PercentOutput, 0.0);
+      m_shoot.set(ControlMode.PercentOutput, 0);
     }
     /*in the event that the above else{} statement is janky, use a really long one of these
     if(!operator.getRawButton(RobotMap.shootIntakeButtonIn) && !operator.getRawButton(RobotMap.shootIntakeButtonOut)){

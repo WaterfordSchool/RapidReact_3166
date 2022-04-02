@@ -16,10 +16,35 @@ public class RobotMap {
     public static final int SHOOTID = 5; 
     public static final int SHOOTINTAKEID = 6; 
 
+    //auto
+        //auto speeds
+            public static final double AUTOSHOOTINTAKESPEED = 0;
+            public static final double AUTOINDEXERSPEED = 0;
+            public static final double AUTOSHOOTSPEED = 0;
+            public static final double AUTODRIVESPEEDFOR = 0;
+            public static final double AUTODRIVESPEEDBAC = 0;
+
+        //auto durations
+            public static final double AUTOSPINUPSHOOTINIT = 2.5;
+            public static final double AUTOSHOOTFIRST = AUTOSPINUPSHOOTINIT + 2.5;
+            public static final double AUTODRIVEBACK = AUTOSHOOTFIRST + 4.9;
+            public static final double AUTOSTOPDRIVE = AUTODRIVEBACK + .6;
+            /*public static final double AUTODRIVEFOR = AUTOSTOPDRIVE + 3.9;
+            public static final double AUTOSPINUPSHOOTSEC = AUTODRIVEFOR + AUTOSPINUPSHOOTINIT;
+            public static final double AUTOSHOOTSEC = AUTOSPINUPSHOOTSEC + 2.5;
+            public static final double AUTOSTOPSHOOTSEC = AUTOSHOOTSEC + 4.9;*/
+
 
 
     //ramping
     public static final double RAMP_VAL = 0.1;
+
+    //tele op motor powers
+    public static final double TELEOPINDEXSPEEDFOR = .6;
+    public static final double TELEOPINDEXSPEEDBAC = -.2;
+    public static final double TELEOPSHOOTINTAKESPEEDIN = -.4;
+    public static final double TELEOPSHOOTINTAKESPEEDOUT = .4;
+    public static final double TELEOPSHOOTSPEED = .65;
 
     //operator controls
     public static final int shootButton = 1;
