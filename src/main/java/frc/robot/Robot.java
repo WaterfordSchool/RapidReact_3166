@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 //import com.ctre.phoenix.motorcontrol.ControlMode;
 //import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
@@ -38,7 +39,7 @@ public class Robot extends TimedRobot {
   DifferentialDrive drive = new DifferentialDrive(driveL, driveR);
 
    //shoot motors
-   //TalonSRX m_indexer = new TalonSRX(RobotMap.INDEXID);
+   TalonSRX m_indexer = new TalonSRX(RobotMap.INDEXID);
    CANSparkMax m_shootIntake = new CANSparkMax(RobotMap.SHOOTINTAKEID, MotorType.kBrushless);
    CANSparkMax m_shoot = new CANSparkMax(RobotMap.SHOOTID, MotorType.kBrushless);
 
@@ -121,6 +122,11 @@ public class Robot extends TimedRobot {
     }
   }
 } 
+public void arcadeDrive(){
+  //1 = speed
+  //4 = turn
+  drive.arcadeDrive(-driver.getRawAxis(4), -driver.getRawAxis(1));
+}
 
   public void allShoot(){
     //shootIntake
