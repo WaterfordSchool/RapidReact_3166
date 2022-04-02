@@ -5,8 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-//import com.ctre.phoenix.motorcontrol.ControlMode;
-//import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -132,22 +131,22 @@ public void arcadeDrive(){
     //shootIntake
     if(operator.getRawButton(RobotMap.shootIntakeButtonIn)){
       m_shootIntake.set(-.4);
-      //m_indexer.set(ControlMode.PercentOutput, -0.2);
+      m_indexer.set(ControlMode.PercentOutput, -0.2);
     }
     if(operator.getRawButton(RobotMap.shootIntakeButtonOut)){
       m_shootIntake.set(.4);
-     // m_indexer.set(ControlMode.PercentOutput, 0);
+     m_indexer.set(ControlMode.PercentOutput, 0);
     }
     //index
     if(operator.getRawButton(RobotMap.indexButton)){
-     // m_indexer.set(ControlMode.PercentOutput, .6);
+     m_indexer.set(ControlMode.PercentOutput, .6);
     }
     //shoot
     if(operator.getRawButton(RobotMap.shootButton)){
       m_shoot.set(.65);
     }
     else{
-     // m_indexer.set(ControlMode.PercentOutput, 0);
+      m_indexer.set(ControlMode.PercentOutput, 0);
       m_shootIntake.set(0.0);
       m_shoot.set(0);
     }
