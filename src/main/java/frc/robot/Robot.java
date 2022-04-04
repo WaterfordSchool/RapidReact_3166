@@ -10,9 +10,13 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 
@@ -44,8 +48,17 @@ public class Robot extends TimedRobot {
    TalonFX m_shootIntake = new TalonFX(RobotMap.SHOOTINTAKEID);  
    TalonFX m_shoot = new TalonFX(RobotMap.SHOOTID);
 
+   //intake motors
+   TalonSRX m_feedleft = new TalonSRX(RobotMap.FEEDLEFTID);
+   TalonSRX m_feedright = new TalonSRX(RobotMap.FEEDRIGHTID);
+
    //auto/timer stuffs
    Timer timer = new Timer();
+
+   //pneumatics
+   DoubleSolenoid leftSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLLEFTCHANNELFOR, RobotMap.SOLLEFTCHANNELBAC);
+   DoubleSolenoid rightSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLRIGHTCHANNELFOR, RobotMap.SOLRIGHTCHANNELBAC);
+   Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
 
 
   /**
@@ -53,7 +66,11 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    compressor.enableDigital();
+    leftSolenoid.set(Value.kOff);
+    rightSolenoid.set(Value.kOff);
+  }
 
   @Override
   public void robotPeriodic() {
@@ -194,5 +211,30 @@ public void arcadeDrive(){
     if(!operator.getRawButton(RobotMap.shootIntakeButtonIn) && !operator.getRawButton(RobotMap.shootIntakeButtonOut)){
       m_shootIntake.set(0.0);
     }*/
+  }
+
+  public void feed(){
+    if(operator.getRawButton(RobotMap.feedButton)){
+      m_feedleft.set(ControlMode.PercentOutput, RobotMap.INTAKEFEEDLEFTSPEED);
+      m_feedright.set(ControlMode.PercentOutput, -RobotMap.INTAKEFEEDLEFTSPEED);
+    }
+    if(!operator.getRawButton(RobotMap.feedButton)){
+      m_feedleft.set(ControlMode.PercentOutput, 0);
+    }
+  }
+
+  public void deployRetractIntake(){
+    if(operator.getRawButton(RobotMap.intakeOutButton)){
+      leftSolenoid.set(Value.kForward);
+      rightSolenoid.set(Value.kForward);
+    }
+    if(operator.getRawButton(RobotMap.intakeInButton)){
+      leftSolenoid.set(Value.kReverse);
+      rightSolenoid.set(Value.kReverse);
+    }
+    if(!operator.getRawButton(RobotMap.intakeOutButton) && !operator.getRawButton(RobotMap.intakeInButton)){
+      leftSolenoid.set(Value.kOff);
+      rightSolenoid.set(Value.kOff);
+    }
   }
 }

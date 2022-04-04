@@ -16,6 +16,10 @@ public class RobotMap {
     public static final int SHOOTID = 5; 
     public static final int SHOOTINTAKEID = 6; 
 
+    //intake motor controller ids
+    public static final int FEEDLEFTID = 1;
+    public static final int FEEDRIGHTID = 1;
+
     //auto
         //auto speeds
             public static final double AUTOSHOOTINTAKESPEED = 0;
@@ -46,13 +50,26 @@ public class RobotMap {
     public static final double TELEOPSHOOTINTAKESPEEDOUT = .4;
     public static final double TELEOPSHOOTSPEED = .65;
 
+    public static final double INTAKEFEEDLEFTSPEED = 0.6;
+
     //operator controls
     public static final int shootButton = 1;
     public static final int indexButton = 2;
     public static final int shootIntakeButtonIn = 3;
     public static final int shootIntakeButtonOut = 4;
 
+    public static final int feedButton = 5; 
+    public static final int intakeOutButton = 6;
+    public static final int intakeInButton = 7;
+
+
 
     //driver controls
+
+    //pneumatics
+    public static final int SOLLEFTCHANNELFOR = 500;
+    public static final int SOLLEFTCHANNELBAC = 500;
+    public static final int SOLRIGHTCHANNELFOR = 500;
+    public static final int SOLRIGHTCHANNELBAC = 500;
 
 }
