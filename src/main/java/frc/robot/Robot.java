@@ -56,9 +56,9 @@ public class Robot extends TimedRobot {
    Timer timer = new Timer();
 
    //pneumatics
-   DoubleSolenoid leftSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLLEFTCHANNELFOR, RobotMap.SOLLEFTCHANNELBAC);
+   /*DoubleSolenoid leftSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLLEFTCHANNELFOR, RobotMap.SOLLEFTCHANNELBAC);
    DoubleSolenoid rightSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLRIGHTCHANNELFOR, RobotMap.SOLRIGHTCHANNELBAC);
-   Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
+   Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);*/
 
 
   /**
@@ -67,9 +67,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    compressor.enableDigital();
+    /*compressor.enableDigital();
     leftSolenoid.set(Value.kOff);
-    rightSolenoid.set(Value.kOff);
+    rightSolenoid.set(Value.kOff);*/
   }
 
   @Override
@@ -223,7 +223,7 @@ public void arcadeDrive(){
     }
   }
 
-  public void deployRetractIntake(){
+  /*public void deployRetractIntake(){
     if(operator.getRawButton(RobotMap.intakeOutButton)){
       leftSolenoid.set(Value.kForward);
       rightSolenoid.set(Value.kForward);
@@ -236,5 +236,5 @@ public void arcadeDrive(){
       leftSolenoid.set(Value.kOff);
       rightSolenoid.set(Value.kOff);
     }
-  }
+  }*/
 }
