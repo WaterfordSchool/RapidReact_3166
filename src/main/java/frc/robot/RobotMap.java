@@ -12,13 +12,13 @@ public class RobotMap {
    
     
     //shooter motor controller IDs
-    public static final int INDEXID = 7; 
-    public static final int SHOOTID = 5; 
-    public static final int SHOOTINTAKEID = 6; 
+    public static final int INDEXID = 23; 
+    public static final int SHOOTID = 24; 
+    public static final int SHOOTINTAKEID = 25; 
 
     //intake motor controller ids
-    public static final int FEEDLEFTID = 1;
-    public static final int FEEDRIGHTID = 1;
+    public static final int FEEDLEFTID = 11;
+    public static final int FEEDRIGHTID = 10;
 
     //auto
         //auto speeds
