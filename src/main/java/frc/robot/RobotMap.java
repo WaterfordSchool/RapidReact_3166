@@ -44,17 +44,23 @@ public class RobotMap {
     public static final double RAMP_VAL = 0.1;
 
     //tele op motor powers
-    public static final double TELEOPINDEXSPEEDFOR = .6;
-    public static final double TELEOPINDEXSPEEDBAC = -.2;
+    public static final double TELEOPINDEXSPEEDFOR = -.6;
+    public static final double TELEOPINDEXSPEEDBAC = .2;
     public static final double TELEOPSHOOTINTAKESPEEDIN = -.4;
     public static final double TELEOPSHOOTINTAKESPEEDOUT = .4;
     public static final double TELEOPSHOOTSPEED = .65;
 
-    public static final double INTAKEFEEDLEFTSPEED = 0.6;
+    public static final double INTAKEFEEDLEFTSPEED = 0.2;
 
     //operator controls
-    public static final int shootButton = 1;
-    public static final int indexButton = 2;
+
+    //left trigger spinup shoot
+    public static final int shootAxis = 2;
+
+    //right trigger index
+    public static final int indexAxis = 3;
+
+    public static final int shootIntakeAxis = 1;
     public static final int shootIntakeButtonIn = 3;
     public static final int shootIntakeButtonOut = 4;
 

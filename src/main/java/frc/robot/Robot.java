@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -67,13 +68,24 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    
+  }
+
+  @Override
+  public void robotPeriodic() {
+    
+    
+  }
+
+  @Override
+  public void autonomousInit() {
     /*compressor.enableDigital();
     leftSolenoid.set(Value.kOff);
     rightSolenoid.set(Value.kOff);*/
   }
 
   @Override
-  public void robotPeriodic() {
+  public void autonomousPeriodic() {
     
     if(timer.get()<RobotMap.AUTOSPINUPSHOOTINIT){
       m_shoot.set(ControlMode.PercentOutput, RobotMap.AUTOSHOOTSPEED);
@@ -105,12 +117,6 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousInit() {}
-
-  @Override
-  public void autonomousPeriodic() {}
-
-  @Override
   public void teleopInit() {
     driveR1.setOpenLoopRampRate(RobotMap.RAMP_VAL);
     driveR2.setOpenLoopRampRate(RobotMap.RAMP_VAL);
@@ -121,7 +127,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     speedButtons();
-    //allShoot();
+    allShoot();
+    feed();
+    indexer();
     /*drive.arcadeDrive(driver.getRawAxis(0) * 0.8, driver.getRawAxis(3) * 0.8);
     if(driver.getRawAxis(2) > 0){
       drive.arcadeDrive(driver.getRawAxis(0) * 0.8, -driver.getRawAxis(2) * 0.8);
@@ -178,35 +186,47 @@ public void arcadeDrive(){
   drive.arcadeDrive(-driver.getRawAxis(4), -driver.getRawAxis(1));
 }
 
+
+
   public void allShoot(){
+    m_shootIntake.set(ControlMode.PercentOutput, -operator.getRawAxis(RobotMap.shootIntakeAxis));
+    
     //shootIntake
     //if shootintake in, indexer spins opposite direction
-    if(operator.getRawButton(RobotMap.shootIntakeButtonIn)){
+   /* if(operator.getRawButton(RobotMap.shootIntakeButtonIn)){
       m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDIN);
-      if(!operator.getRawButton(RobotMap.indexButton))
+      if(operator.getRawAxis(RobotMap.indexAxis)==0)
       m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDBAC);
-      if(operator.getRawButton(RobotMap.indexButton)){
+      if(operator.getRawAxis(RobotMap.indexAxis)>0){
         m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDFOR);
       }
-    }
+    }*/
     //shoot intake out
-    if(operator.getRawButton(RobotMap.shootIntakeButtonOut)){
+    /*if(operator.getRawButton(RobotMap.shootIntakeButtonOut)){
       m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDOUT);
      m_indexer.set(ControlMode.PercentOutput, 0);
-    }
+    }*/
+
+    
     //index
-    if(operator.getRawButton(RobotMap.indexButton)){
-     m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDFOR);
-    }
+    
+    /*if(operator.getRawAxis(RobotMap.indexAxis)>0){
+      m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDFOR);
+    }*/
+    /*if(operator.getRawAxis(RobotMap.indexAxis)==0){
+      if(operator.getRawAxis(RobotMap.shootIntakeAxis)>0){
+        m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDBAC);
+      }
+    }*/
     //shoot
-    if(operator.getRawButton(RobotMap.shootButton)){
+    if(operator.getRawAxis(RobotMap.shootAxis)>0){
       m_shoot.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTSPEED);
     }
     else{
       m_indexer.set(ControlMode.PercentOutput, 0);
-      m_shootIntake.set(ControlMode.PercentOutput, 0.0);
       m_shoot.set(ControlMode.PercentOutput, 0);
     }
+    
     /*in the event that the above else{} statement is janky, use a really long one of these
     if(!operator.getRawButton(RobotMap.shootIntakeButtonIn) && !operator.getRawButton(RobotMap.shootIntakeButtonOut)){
       m_shootIntake.set(0.0);
@@ -214,15 +234,25 @@ public void arcadeDrive(){
   }
 
   public void feed(){
+    
     if(operator.getRawButton(RobotMap.feedButton)){
       m_feedleft.set(ControlMode.PercentOutput, RobotMap.INTAKEFEEDLEFTSPEED);
       m_feedright.set(ControlMode.PercentOutput, -RobotMap.INTAKEFEEDLEFTSPEED);
     }
     if(!operator.getRawButton(RobotMap.feedButton)){
       m_feedleft.set(ControlMode.PercentOutput, 0);
+      m_feedright.set(ControlMode.PercentOutput, 0);
     }
+    
   }
-
+public void indexer(){
+  if(operator.getRawAxis(RobotMap.indexAxis)>0){
+    m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDFOR);
+  }
+  if(operator.getRawAxis(RobotMap.indexAxis)==0){
+    m_indexer.set(ControlMode.PercentOutput, 0);
+  }
+}
   /*public void deployRetractIntake(){
     if(operator.getRawButton(RobotMap.intakeOutButton)){
       leftSolenoid.set(Value.kForward);
