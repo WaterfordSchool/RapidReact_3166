@@ -189,7 +189,7 @@ public void arcadeDrive(){
 
 
   public void allShoot(){
-    m_shootIntake.set(ControlMode.PercentOutput, -operator.getRawAxis(RobotMap.shootIntakeAxis));
+    m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDOUT*-operator.getRawAxis(RobotMap.shootIntakeAxis));
     
     //shootIntake
     //if shootintake in, indexer spins opposite direction

@@ -44,13 +44,13 @@ public class RobotMap {
     public static final double RAMP_VAL = 0.1;
 
     //tele op motor powers
-    public static final double TELEOPINDEXSPEEDFOR = -.6;
+    public static final double TELEOPINDEXSPEEDFOR = -.9;
     public static final double TELEOPINDEXSPEEDBAC = .2;
     public static final double TELEOPSHOOTINTAKESPEEDIN = -.4;
     public static final double TELEOPSHOOTINTAKESPEEDOUT = .4;
     public static final double TELEOPSHOOTSPEED = .65;
 
-    public static final double INTAKEFEEDLEFTSPEED = 0.2;
+    public static final double INTAKEFEEDLEFTSPEED = 0.7;
 
     //operator controls
 
