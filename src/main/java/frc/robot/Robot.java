@@ -31,16 +31,19 @@ public class Robot extends TimedRobot {
 
   XboxController driver = new XboxController(0);
   XboxController operator = new XboxController(1);
+  XboxController pneumaticsTest = new XboxController(3);
 
   //drive motors
   CANSparkMax driveR1 = new CANSparkMax(RobotMap.R1CANID, MotorType.kBrushless);
   CANSparkMax driveR2 = new CANSparkMax(RobotMap.R2CANID, MotorType.kBrushless);
+  CANSparkMax driveR3 = new CANSparkMax(RobotMap.R3CANID, MotorType.kBrushless);
   CANSparkMax driveL1 = new CANSparkMax(RobotMap.L1CANID, MotorType.kBrushless);
   CANSparkMax driveL2 = new CANSparkMax(RobotMap.L2CANID, MotorType.kBrushless);
+  CANSparkMax driveL3 = new CANSparkMax(RobotMap.L3CANID, MotorType.kBrushless);
 
 
-  MotorControllerGroup driveR = new MotorControllerGroup(driveR1, driveR2);
-  MotorControllerGroup driveL = new MotorControllerGroup(driveL1, driveL2);
+  MotorControllerGroup driveR = new MotorControllerGroup(driveR1, driveR2, driveR3);
+  MotorControllerGroup driveL = new MotorControllerGroup(driveL1, driveL2, driveL3);
 
   DifferentialDrive drive = new DifferentialDrive(driveL, driveR);
 
@@ -52,14 +55,16 @@ public class Robot extends TimedRobot {
    //intake motors
    TalonSRX m_feedleft = new TalonSRX(RobotMap.FEEDLEFTID);
    TalonSRX m_feedright = new TalonSRX(RobotMap.FEEDRIGHTID);
+   TalonSRX m_intake = new TalonSRX(RobotMap.INTAKEID);
+   TalonSRX m_climber = new TalonSRX(RobotMap.CLIMBID);
 
    //auto/timer stuffs
    Timer timer = new Timer();
 
    //pneumatics
-   /*DoubleSolenoid leftSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLLEFTCHANNELFOR, RobotMap.SOLLEFTCHANNELBAC);
-   DoubleSolenoid rightSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLRIGHTCHANNELFOR, RobotMap.SOLRIGHTCHANNELBAC);
-   Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);*/
+   DoubleSolenoid doubleSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLCHANNELFOR, RobotMap.SOLCHANNELBAC);
+   //DoubleSolenoid rightSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, RobotMap.SOLRIGHTCHANNELFOR, RobotMap.SOLRIGHTCHANNELBAC);
+  // Compressor compressor = new Compressor(PneumaticsModuleType.CTREPCM);
 
 
   /**
@@ -68,7 +73,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    
+    /*compressor.start();
+    compressor.enableDigital();*/
   }
 
   @Override
@@ -79,9 +85,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    /*compressor.enableDigital();
-    leftSolenoid.set(Value.kOff);
-    rightSolenoid.set(Value.kOff);*/
+    doubleSolenoid.set(Value.kReverse);
+    timer.start();
+    timer.reset();
   }
 
   @Override
@@ -90,7 +96,6 @@ public class Robot extends TimedRobot {
     if(timer.get()<RobotMap.AUTOSPINUPSHOOTINIT){
       m_shoot.set(ControlMode.PercentOutput, RobotMap.AUTOSHOOTSPEED);
 
-      //deployRetract.set(0.2);
     }
     if(timer.get()<RobotMap.AUTOSHOOTFIRST&& timer.get()> RobotMap.AUTOSPINUPSHOOTINIT){
       //shooter.set(RobotMap.AUTOSHOOTSPEED);
@@ -98,7 +103,6 @@ public class Robot extends TimedRobot {
       m_indexer.set(ControlMode.PercentOutput, RobotMap.AUTOINDEXERSPEED);
 
 
-      //deployRetract.set(0.0);
     }
     if(timer.get()>RobotMap.AUTOSHOOTFIRST &&timer.get()<RobotMap.AUTODRIVEBACK){
       m_shoot.set(ControlMode.PercentOutput, 0);
@@ -107,7 +111,7 @@ public class Robot extends TimedRobot {
 
 
       
-      drive.arcadeDrive(0, .36);
+      drive.arcadeDrive(0, -.36);
       //intake.set(-0.7);
     }
     
@@ -126,10 +130,19 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    /*troubleshooting: 
+1. push code without driverReverseAll, possible confusion with elses
+2. return to allShoot, reevaluate
+    */
     speedButtons();
-    allShoot();
-    feed();
-    indexer();
+    operatorAllMethods();
+    deployRetractIntake();
+    climb();
+    //driverReverseAll();
+    //shootIntake();
+    //shoot();
+   // feed();
+    //indexer();
     /*drive.arcadeDrive(driver.getRawAxis(0) * 0.8, driver.getRawAxis(3) * 0.8);
     if(driver.getRawAxis(2) > 0){
       drive.arcadeDrive(driver.getRawAxis(0) * 0.8, -driver.getRawAxis(2) * 0.8);
@@ -155,52 +168,106 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {}
 
+  public void operatorAllMethods(){
+    /*
+    trigger throttle shooter
+    intake button
+    shoot button
+    reverse button
+    */
+    //intake method
+    if(operator.getRawButton(RobotMap.OPERATORALLINTAKEBUTTON)){
+      //Y
+      //run intake, no intake yet
+      m_intake.set(ControlMode.PercentOutput, RobotMap.TELEOPINTAKESPEEDIN);
+      m_feedleft.set(ControlMode.PercentOutput, RobotMap.INTAKEFEEDLEFTSPEED);
+      m_feedright.set(ControlMode.PercentOutput, -RobotMap.INTAKEFEEDLEFTSPEED);
+      m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDIN);
+      m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDBAC);
+    }
+//shoot method
+    if(operator.getRawAxis(RobotMap.shootAxis)>0){
+      //L trigger
+      m_shoot.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTSPEED);
+      m_shootIntake.set(ControlMode.PercentOutput, -RobotMap.TELEOPSHOOTINTAKESPEEDIN);
+    }
+    if(operator.getRawAxis(3)>0){
+      m_shoot.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTSPEED);
+    }
+   /* if(operator.getRawButton(RobotMap.OPERATORALLSHOOTBUTTON)){
+   
+      //if(timer.get() < RobotMap.THROTTLEUPTIME){
+        //m_shoot.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTSPEED);
+      //}
+      //if(timer.get() > RobotMap.THROTTLEUPTIME){
+        m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDIN);
+        m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDFOR);
+      //}
+    }*/
+    //reverse button, moved so as not to interfere with other methods
+   /* if(driver.getRawButton(RobotMap.DRIVERREVERSEBUTTON)){
+      m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPREVERSEINDEXSPEED);
+      m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDOUT);
+      //reverse intake, when intake is done
+      //m_intake.set(ControlMode.PercentOutput, RobotMap.TELEOPINTAKESPEEDOUT);
+    }*/
+    if(!operator.getRawButton(RobotMap.OPERATORALLINTAKEBUTTON) && operator.getRawAxis(RobotMap.shootAxis)==0 && operator.getRawAxis(3)==0){
+      m_feedleft.set(ControlMode.PercentOutput, 0);
+      m_feedright.set(ControlMode.PercentOutput, 0);
+      m_shootIntake.set(ControlMode.PercentOutput, 0);
+      m_indexer.set(ControlMode.PercentOutput, 0);
+      m_shoot.set(ControlMode.PercentOutput, 0);
+      m_intake.set(ControlMode.PercentOutput, 0);
+     
+    }
+  }
+
   public void speedButtons(){
     //slow button for xbox controller
    if(driver.getRawButton(3)){
-    drive.arcadeDrive(-driver.getRawAxis(0) * 0.2, -driver.getRawAxis(3) * 0.2);
+    drive.arcadeDrive(driver.getRawAxis(0) * 0.2, driver.getRawAxis(3) * 0.2);
     if(driver.getRawAxis(2) > 0){
-    drive.arcadeDrive(-driver.getRawAxis(0) * 0.2, driver.getRawAxis(2) * 0.2);
+    drive.arcadeDrive(driver.getRawAxis(0) * 0.2, -driver.getRawAxis(2) * 0.2);
     }
   }
 
  //fast button for xbox controller
   else if(driver.getRawButton(1)){
-    drive.arcadeDrive(-driver.getRawAxis(0), -driver.getRawAxis(3));
+    drive.arcadeDrive(driver.getRawAxis(0), driver.getRawAxis(3));
     if(driver.getRawAxis(2)>0){
-      drive.arcadeDrive(-driver.getRawAxis(0), driver.getRawAxis(2));
+      drive.arcadeDrive(driver.getRawAxis(0), -driver.getRawAxis(2));
     }
   }
 
  //default condition for neither buttons active
   else if(!driver.getRawButton(3) || !driver.getRawButton(1)){
-    drive.arcadeDrive(-driver.getRawAxis(0) * 0.8, -driver.getRawAxis(3) * 0.8);
+    drive.arcadeDrive(driver.getRawAxis(0) * 0.8, driver.getRawAxis(3) * 0.8);
     if(driver.getRawAxis(2) > 0){
-      drive.arcadeDrive(-driver.getRawAxis(0) * 0.8, driver.getRawAxis(2) * 0.8);
+      drive.arcadeDrive(driver.getRawAxis(0) * 0.8, -driver.getRawAxis(2) * 0.8);
     }
   }
 } 
-public void arcadeDrive(){
-  //1 = speed
-  //4 = turn
-  drive.arcadeDrive(-driver.getRawAxis(4), -driver.getRawAxis(1));
-}
 
 
-
-  public void allShoot(){
-    m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDOUT*-operator.getRawAxis(RobotMap.shootIntakeAxis));
+public void shoot(){
+  if(operator.getRawAxis(RobotMap.shootAxis)>0){
+    m_shoot.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTSPEED);
+  }
+else{m_shoot.set(ControlMode.PercentOutput, 0);}}
+ public void shootIntake(){
+    m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDIN*operator.getRawAxis(RobotMap.shootIntakeAxis));
     
     //shootIntake
     //if shootintake in, indexer spins opposite direction
-   /* if(operator.getRawButton(RobotMap.shootIntakeButtonIn)){
+   /*if(operator.getRawButton(RobotMap.shootIntakeButtonIn)){
       m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDIN);
-      if(operator.getRawAxis(RobotMap.indexAxis)==0)
-      m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDBAC);
-      if(operator.getRawAxis(RobotMap.indexAxis)>0){
-        m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDFOR);
-      }
-    }*/
+   }
+    if(operator.getRawButton(RobotMap.shootIntakeButtonOut)){
+        m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDOUT);
+    }
+   else{m_shootIntake.set(ControlMode.PercentOutput, 0);}
+   */
+  }
     //shoot intake out
     /*if(operator.getRawButton(RobotMap.shootIntakeButtonOut)){
       m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDOUT);
@@ -219,27 +286,41 @@ public void arcadeDrive(){
       }
     }*/
     //shoot
-    if(operator.getRawAxis(RobotMap.shootAxis)>0){
-      m_shoot.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTSPEED);
-    }
+    /*
     else{
       m_indexer.set(ControlMode.PercentOutput, 0);
       m_shoot.set(ControlMode.PercentOutput, 0);
-    }
+    }*/
+    
     
     /*in the event that the above else{} statement is janky, use a really long one of these
     if(!operator.getRawButton(RobotMap.shootIntakeButtonIn) && !operator.getRawButton(RobotMap.shootIntakeButtonOut)){
       m_shootIntake.set(0.0);
     }*/
-  }
+  //}
+
+  /*public void driverReverseAll(){
+    if(driver.getRawButton(RobotMap.DRIVERREVERSEBUTTON)){
+      m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPREVERSEINDEXSPEED);
+      m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDOUT);
+      //reverse intake, when intake is done
+      //m_intake.set(ControlMode.PercentOutput, RobotMap.TELEOPINTAKESPEEDOUT);
+    }
+    else{
+      m_indexer.set(ControlMode.PercentOutput, 0);
+      m_shootIntake.set(ControlMode.PercentOutput, 0);
+      //m_intake.set(ControlMode.PercentOutput, 0);
+
+    }
+  }*/
 
   public void feed(){
     
-    if(operator.getRawButton(RobotMap.feedButton)){
+    if(driver.getRawButton(RobotMap.feedButton)){
       m_feedleft.set(ControlMode.PercentOutput, RobotMap.INTAKEFEEDLEFTSPEED);
       m_feedright.set(ControlMode.PercentOutput, -RobotMap.INTAKEFEEDLEFTSPEED);
     }
-    if(!operator.getRawButton(RobotMap.feedButton)){
+    if(!driver.getRawButton(RobotMap.feedButton)){
       m_feedleft.set(ControlMode.PercentOutput, 0);
       m_feedright.set(ControlMode.PercentOutput, 0);
     }
@@ -253,18 +334,30 @@ public void indexer(){
     m_indexer.set(ControlMode.PercentOutput, 0);
   }
 }
-  /*public void deployRetractIntake(){
-    if(operator.getRawButton(RobotMap.intakeOutButton)){
-      leftSolenoid.set(Value.kForward);
-      rightSolenoid.set(Value.kForward);
+  public void deployRetractIntake(){
+    
+    if(operator.getRawButton(RobotMap.deployRetractIntakeOut)){
+      //A
+      doubleSolenoid.set(Value.kForward);
     }
-    if(operator.getRawButton(RobotMap.intakeInButton)){
-      leftSolenoid.set(Value.kReverse);
-      rightSolenoid.set(Value.kReverse);
+    else if(operator.getRawButton(RobotMap.deployRetractIntakeIn)){
+      //B
+      doubleSolenoid.set(Value.kReverse);
     }
-    if(!operator.getRawButton(RobotMap.intakeOutButton) && !operator.getRawButton(RobotMap.intakeInButton)){
-      leftSolenoid.set(Value.kOff);
-      rightSolenoid.set(Value.kOff);
+    /*if(!pneumaticsTest.getRawButton(RobotMap.intakeOutButton) && !pneumaticsTest.getRawButton(RobotMap.intakeInButton)){
+      doubleSolenoid.set(Value.kOff);
+    }*/
+  }
+  public void climb(){
+    if(operator.getPOV() == 0){
+      m_climber.set(ControlMode.PercentOutput, -1);
     }
-  }*/
+    if(operator.getPOV() == 180){
+      m_climber.set(ControlMode.PercentOutput, 1);
+    }
+    if(operator.getPOV()!=0 && operator.getPOV()!= 180){
+      m_climber.set(ControlMode.PercentOutput, 0);
+    }
+
+  }
 }
