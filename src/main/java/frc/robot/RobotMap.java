@@ -40,10 +40,10 @@ public class RobotMap {
             public static final double AUTOSHOOTFIRST = AUTOSPINUPSHOOTINIT + 2.5;
             public static final double AUTODRIVEBACK = AUTOSHOOTFIRST + 4.9;
             public static final double AUTOSTOPDRIVE = AUTODRIVEBACK + .6;
-            /*public static final double AUTODRIVEFOR = AUTOSTOPDRIVE + 3.9;
+            public static final double AUTODRIVEFOR = AUTOSTOPDRIVE + 4.9;
             public static final double AUTOSPINUPSHOOTSEC = AUTODRIVEFOR + AUTOSPINUPSHOOTINIT;
             public static final double AUTOSHOOTSEC = AUTOSPINUPSHOOTSEC + 2.5;
-            public static final double AUTOSTOPSHOOTSEC = AUTOSHOOTSEC + 4.9;*/
+            public static final double AUTOSTOPSHOOTSEC = AUTOSHOOTSEC + 4.9;
 
     //ramping
     public static final double RAMP_VAL = 0.1;
@@ -88,6 +88,9 @@ public class RobotMap {
     public static final int SOLCHANNELFOR = 0;
     public static final int SOLCHANNELBAC = 1;
 
+    //leds
+    public static final int LEDSPORT = 0;
+    
     public static final int AMOUNTOFPATIENCEIHAVELEFT = 0;
 
 }
