@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -34,7 +35,6 @@ public class Robot extends TimedRobot {
 
   XboxController driver = new XboxController(0);
   XboxController operator = new XboxController(1);
-  XboxController pneumaticsTest = new XboxController(3);
 
   //drive motors
   CANSparkMax driveR1 = new CANSparkMax(RobotMap.R1CANID, MotorType.kBrushless);
@@ -92,16 +92,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void robotPeriodic() {
-    
-  }
+  public void robotPeriodic() {}
 
   @Override
   public void autonomousInit() {
     doubleSolenoid.set(Value.kReverse);
     timer.start();
     timer.reset();
-    leds.set(-0.99);
+    //leds.set(-0.99);
     currentAngle = gyro.getAngle();
   }
 
@@ -110,19 +108,19 @@ public class Robot extends TimedRobot {
     
     if(timer.get()<RobotMap.AUTOSPINUPSHOOTINIT){
       m_shoot.set(ControlMode.PercentOutput, RobotMap.AUTOSHOOTSPEED);
-      leds.set(.57);
+      //leds.set(.57);
     }
     if(timer.get()<RobotMap.AUTOSHOOTFIRST&& timer.get()> RobotMap.AUTOSPINUPSHOOTINIT){
       //shooter.set(RobotMap.AUTOSHOOTSPEED);
       m_shootIntake.set(ControlMode.PercentOutput, RobotMap.AUTOSHOOTINTAKESPEED);
       m_indexer.set(ControlMode.PercentOutput, RobotMap.AUTOINDEXERSPEED);
-      leds.set(.89);
+      //leds.set(.89);
     }
     if(timer.get()>RobotMap.AUTOSHOOTFIRST &&timer.get()<RobotMap.AUTODRIVEBACK){
       m_shoot.set(ControlMode.PercentOutput, 0);
       m_shootIntake.set(ControlMode.PercentOutput, 0);
       m_indexer.set(ControlMode.PercentOutput, 0);
-      leds.set(-0.45);
+      //leds.set(-0.45);
 
       drive.arcadeDrive(0, -.36);
       //intake.set(-0.7);
@@ -130,7 +128,7 @@ public class Robot extends TimedRobot {
     
     if(timer.get()>RobotMap.AUTODRIVEBACK && timer.get()<RobotMap.AUTOSTOPDRIVE){
       drive.arcadeDrive(0,0);
-      leds.set(-0.57);
+      //leds.set(-0.57);
     }
     //Two ball auto (untested)
     /*if(timer.get()>RobotMap.AUTOSTOPDRIVE && timer.get()< RobotMap.AUTODRIVEFOR){
@@ -205,8 +203,8 @@ public class Robot extends TimedRobot {
       //Y
       //run intake, no intake yet
       m_intake.set(ControlMode.PercentOutput, RobotMap.TELEOPINTAKESPEEDIN);
-      m_feedleft.set(ControlMode.PercentOutput, RobotMap.INTAKEFEEDLEFTSPEED);
-      m_feedright.set(ControlMode.PercentOutput, -RobotMap.INTAKEFEEDLEFTSPEED);
+      //m_feedleft.set(ControlMode.PercentOutput, RobotMap.INTAKEFEEDLEFTSPEED);
+      //m_feedright.set(ControlMode.PercentOutput, -RobotMap.INTAKEFEEDLEFTSPEED);
       m_shootIntake.set(ControlMode.PercentOutput, RobotMap.TELEOPSHOOTINTAKESPEEDIN);
       m_indexer.set(ControlMode.PercentOutput, RobotMap.TELEOPINDEXSPEEDBAC);
     }
@@ -237,8 +235,8 @@ public class Robot extends TimedRobot {
       //m_intake.set(ControlMode.PercentOutput, RobotMap.TELEOPINTAKESPEEDOUT);
     }*/
     if(!operator.getRawButton(RobotMap.OPERATORALLINTAKEBUTTON) && operator.getRawAxis(RobotMap.shootAxis)==0 && operator.getRawAxis(3)==0){
-      m_feedleft.set(ControlMode.PercentOutput, 0);
-      m_feedright.set(ControlMode.PercentOutput, 0);
+      //m_feedleft.set(ControlMode.PercentOutput, 0);
+      //m_feedright.set(ControlMode.PercentOutput, 0);
       m_shootIntake.set(ControlMode.PercentOutput, 0);
       m_indexer.set(ControlMode.PercentOutput, 0);
       m_shoot.set(ControlMode.PercentOutput, 0);
